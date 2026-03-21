@@ -7,7 +7,7 @@ Configuração de Perfil do PowerShell 7.5.4 otimizado para performance (< 600ms
 Copie e cole o comando abaixo no seu PowerShell para configurar todas as dependências, baixar o perfil otimizado e o tema `gruvbox`:
 
 ```powershell
-Invoke-RestMethod "https://raw.githubusercontent.com/henriwasd/windows-terminal/main/setup_notebook.ps1" | Invoke-Expression
+Invoke-RestMethod "https://raw.githubusercontent.com/henriwasd/windows/main/setup.ps1" | Invoke-Expression
 ```
 
 ### O que este script faz:
