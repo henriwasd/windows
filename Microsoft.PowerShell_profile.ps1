@@ -1,5 +1,4 @@
 # PowerShell Profile - Optimized for Speed
-# Refactored Version 2.0 (Gemini CLI)
 
 $debug = $false
 
@@ -22,53 +21,40 @@ $profileDir = Get-ProfileDir
 $timeFilePath = "$profileDir\LastExecutionTime.txt"
 $updateInterval = 30 # Check for updates every 30 days instead of 7
 
-# Cache Paths
-$cacheDir = "$HOME\.cache\powershell"
-if (-not (Test-Path $cacheDir))
-{
-    New-Item -ItemType Directory -Path $cacheDir -Force | Out-Null
-}
-$ompCacheFile = "$cacheDir\omp-init.ps1"
-$zCacheFile = "$cacheDir\zoxide-init.ps1"
-
 # 1. Terminal Icons - Import silently if available
 if (Get-Module -ListAvailable Terminal-Icons)
 {
     Import-Module Terminal-Icons -ErrorAction SilentlyContinue
 }
 
-# 2. Oh My Posh - Cached Initialization
+# 2. Oh My Posh - Direct Initialization (Caching causes Ctrl+C freezes)
 $localThemePath = Join-Path $profileDir "gruvbox.omp.json"
 if (-not (Test-Path $localThemePath))
 {
-    # If the theme file is missing locally, try to download it from your repo
-    $themeUrl = "https://raw.githubusercontent.com/henriwasd/windows-terminal/main/gruvbox.omp.json"
+    # If the theme file is missing locally, try to download it from the official repo
+    $themeUrl = "https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/gruvbox.omp.json"
     try
     { Invoke-RestMethod -Uri $themeUrl -OutFile $localThemePath
     } catch
     {
     }
 }
-if (-not (Test-Path $ompCacheFile) -or (Get-Item $ompCacheFile).LastWriteTime -lt (Get-Date).AddDays(-7))
+
+if (Get-Command oh-my-posh -ErrorAction SilentlyContinue)
 {
     if (Test-Path $localThemePath)
     {
-        oh-my-posh init pwsh --config $localThemePath | Out-File $ompCacheFile
+        oh-my-posh init pwsh --config $localThemePath | Invoke-Expression
     } else
     {
-        oh-my-posh init pwsh --config https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/gruvbox.omp.json | Out-File $ompCacheFile
+        oh-my-posh init pwsh --config https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/gruvbox.omp.json | Invoke-Expression
     }
 }
-. $ompCacheFile
 
-# 3. Zoxide - Cached Initialization
+# 3. Zoxide - Direct Initialization
 if (Get-Command zoxide -ErrorAction SilentlyContinue)
 {
-    if (-not (Test-Path $zCacheFile) -or (Get-Item $zCacheFile).LastWriteTime -lt (Get-Date).AddDays(-7))
-    {
-        zoxide init --cmd z powershell | Out-File $zCacheFile
-    }
-    . $zCacheFile
+    zoxide init --cmd z powershell | Out-String | Invoke-Expression
 }
 
 # 4. PSReadLine Configuration (Enhanced Experience)
@@ -153,18 +139,7 @@ function nf
     param($name) New-Item -ItemType "file" -Path . -Name $name
 }
 
-# Admin Prompt
-$isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-function prompt
-{
-    if ($isAdmin)
-    {
-        "[$(Get-Location)] # "
-    } else
-    {
-        "[$(Get-Location)] $ "
-    }
-}
+# (The custom prompt function was removed because it conflicted with Oh My Posh and caused terminal freezes)
 
 # 6. Background Update Checks (Deferred to keep startup fast)
 $lastExecRaw = if (Test-Path $timeFilePath)
@@ -179,7 +154,6 @@ $lastExecRaw = if (Test-Path $timeFilePath)
 if (((Get-Date) - $lastExec).TotalDays -gt $updateInterval)
 {
     Write-Host "Updating profile in background..." -ForegroundColor DarkGray
-    # Update logic moved to a fast check
     (Get-Date -Format 'yyyy-MM-dd') | Out-File -FilePath $timeFilePath
 }
 
@@ -190,3 +164,9 @@ function Show-Help
 }
 
 Write-Host "Use 'Show-Help' to display help" -ForegroundColor DarkGray
+
+# 7. Initialize mise (Must be after oh-my-posh to wrap the prompt correctly)
+if (Get-Command mise -ErrorAction SilentlyContinue)
+{
+    mise activate pwsh | Out-String | Invoke-Expression
+}
