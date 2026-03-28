@@ -1,7 +1,0 @@
-
-$schema                : https://raw.githubusercontent.com/JanDeDobbeleer/oh-my-posh/main/themes/schema.json
-blocks                 : {@{alignment=left; segments=System.Object[]; type=prompt}}
-console_title_template : {{ .Folder }}
-final_space            : True
-version                : 4
-
