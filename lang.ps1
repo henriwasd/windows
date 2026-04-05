@@ -1,6 +1,6 @@
 # --- Variables ---
 
-$targetLanguage = "en-US" # Replace with the desired language code (e.g., "en-US", "fr-FR")
+$targetLanguage = "pt-BR" # Replace with the desired language code (e.g., "en-US", "fr-FR")
 
 # --- Install Language Pack ---
 
