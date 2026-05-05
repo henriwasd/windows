@@ -17,6 +17,28 @@ if (Get-Module -ListAvailable PSReadLine) {
     Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 }
 
+if (Get-Command zoxide -ErrorAction SilentlyContinue) { Invoke-Expression (&zoxide init powershell | Out-String) }
+
+if (Get-Command eza -ErrorAction SilentlyContinue) {
+    if (Test-Path Alias:ls) { Remove-Item Alias:ls }
+    function ls { eza --icons $args }
+    function ll { eza -l --icons --git $args }
+}
+
+if (Get-Command lazygit -ErrorAction SilentlyContinue) { function lg { lazygit $args } }
+
+if (Get-Command yazi -ErrorAction SilentlyContinue) {
+    function y {
+        $tmp = New-TemporaryFile
+        yazi $args --cwd-file=$tmp
+        if (Test-Path $tmp) {
+            $cwd = Get-Content $tmp
+            if ($cwd) { cd $cwd }
+            Remove-Item -Force $tmp
+        }
+    }
+}
+
 # 2. Prompt Minimalista sem Cores
 function prompt {
     $path = $ExecutionContext.SessionState.Path.CurrentLocation
@@ -41,9 +63,6 @@ function prompt {
 }
 
 # 3. Aliases
-Set-Alias -Name ep -Value Edit-Profile
-function Edit-Profile { notepad $PROFILE }
-function pj { Set-Location "$HOME\Projects" }
 function ga { git add . }
 function gc { param($m) git commit -m "$m" }
 function gs { git status }
