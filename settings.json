@@ -1,102 +1,102 @@
 {
-    "$help": "https://aka.ms/terminal-documentation",
-    "$schema": "https://aka.ms/terminal-profiles-schema",
-    "actions": [
-        {
-            "command": {
-                "action": "copy",
-                "singleLine": false
-            },
-            "id": "User.copy.644BA8F2",
-            "keys": "ctrl+c"
-        },
-        {
-            "command": "paste",
-            "id": "User.paste",
-            "keys": "ctrl+v"
-        },
-        {
-            "command": "find",
-            "id": "User.find",
-            "keys": "ctrl+shift+f"
-        },
-        {
-            "command": {
-                "action": "splitPane",
-                "split": "auto",
-                "splitMode": "duplicate"
-            },
-            "id": "User.splitPane.A6751878",
-            "keys": "alt+shift+d"
-        },
-        {
-            "command": {
-                "action": "splitPane"
-            },
-            "id": "User.splitPane.91AB55B1",
-            "keys": "alt+\\"
-        },
-        {
-            "command": "closePane",
-            "id": "User.closePane",
-            "keys": "alt+w"
-        }
-    ],
-    "copyFormatting": "none",
-    "copyOnSelect": false,
-    "defaultProfile": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
-    "newTabMenu": [
-        {
-            "type": "remainingProfiles"
-        }
-    ],
-    "profiles": {
-        "defaults": {
-            "colorScheme": "Gruvbox Dark",
-            "cursorShape": "filledBox",
-            "font": {
-                "face": "JetBrainsMono Nerd Font"
-            }
-        },
-        "list": [
-            {
-                "commandline": "%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
-                "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
-                "hidden": false,
-                "name": "Windows PowerShell"
-            },
-            {
-                "guid": "{256dd721-4293-5966-a1be-9ceb0bb1c3ec}",
-                "hidden": false,
-                "name": "Arch",
-                "source": "Microsoft.WSL"
-            }
-        ]
+  "$help": "https://aka.ms/terminal-documentation",
+  "$schema": "https://aka.ms/terminal-profiles-schema",
+  "actions": [
+    {
+      "command": {
+        "action": "copy",
+        "singleLine": false
+      },
+      "id": "User.copy.644BA8F2",
+      "keys": "ctrl+c"
     },
-    "schemes": [
-        {
-            "name": "Gruvbox Dark",
-            "black": "#282828",
-            "red": "#cc241d",
-            "green": "#98971a",
-            "yellow": "#d79921",
-            "blue": "#458588",
-            "purple": "#b16286",
-            "cyan": "#689d6a",
-            "white": "#a89984",
-            "brightBlack": "#928374",
-            "brightRed": "#fb4934",
-            "brightGreen": "#b8bb26",
-            "brightYellow": "#fabd2f",
-            "brightBlue": "#83a598",
-            "brightPurple": "#d3869b",
-            "brightCyan": "#8ec07c",
-            "brightWhite": "#ebdbb2",
-            "background": "#282828",
-            "foreground": "#ebdbb2",
-            "cursorColor": "#ebdbb2",
-            "selectionBackground": "#928374"
-        }
-    ],
-    "themes": []
+    {
+      "command": "paste",
+      "id": "User.paste",
+      "keys": "ctrl+v"
+    },
+    {
+      "command": "find",
+      "id": "User.find",
+      "keys": "ctrl+shift+f"
+    },
+    {
+      "command": {
+        "action": "splitPane",
+        "split": "auto",
+        "splitMode": "duplicate"
+      },
+      "id": "User.splitPane.A6751878",
+      "keys": "alt+shift+d"
+    },
+    {
+      "command": {
+        "action": "splitPane"
+      },
+      "id": "User.splitPane.91AB55B1",
+      "keys": "alt+\\"
+    },
+    {
+      "command": "closePane",
+      "id": "User.closePane",
+      "keys": "alt+w"
+    }
+  ],
+  "copyFormatting": "none",
+  "copyOnSelect": false,
+  "defaultProfile": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+  "newTabMenu": [
+    {
+      "type": "remainingProfiles"
+    }
+  ],
+  "profiles": {
+    "defaults": {
+      "colorScheme": "Gruvbox Dark",
+      "cursorShape": "filledBox",
+      "font": {
+        "face": "JetBrainsMono Nerd Font"
+      }
+    },
+    "list": [
+      {
+        "commandline": "%SystemRoot%\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+        "guid": "{61c54bbd-c2c6-5271-96e7-009a87ff44bf}",
+        "hidden": false,
+        "name": "Windows PowerShell"
+      },
+      {
+        "guid": "{256dd721-4293-5966-a1be-9ceb0bb1c3ec}",
+        "hidden": false,
+        "name": "Arch",
+        "source": "Microsoft.WSL"
+      }
+    ]
+  },
+  "schemes": [
+    {
+      "name": "Gruvbox Dark",
+      "black": "#282828",
+      "red": "#cc241d",
+      "green": "#98971a",
+      "yellow": "#d79921",
+      "blue": "#458588",
+      "purple": "#b16286",
+      "cyan": "#689d6a",
+      "white": "#a89984",
+      "brightBlack": "#928374",
+      "brightRed": "#fb4934",
+      "brightGreen": "#b8bb26",
+      "brightYellow": "#fabd2f",
+      "brightBlue": "#83a598",
+      "brightPurple": "#d3869b",
+      "brightCyan": "#8ec07c",
+      "brightWhite": "#ebdbb2",
+      "background": "#282828",
+      "foreground": "#ebdbb2",
+      "cursorColor": "#ebdbb2",
+      "selectionBackground": "#928374"
+    }
+  ],
+  "themes": []
 }

@@ -17,8 +17,7 @@ if (Get-Module -ListAvailable PSReadLine) {
     Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 }
 
-if (Get-Command zoxide -ErrorAction SilentlyContinue) { Invoke-Expression (&zoxide init powershell | Out-String) }
-
+# 2. Funções de Ferramentas
 if (Get-Command eza -ErrorAction SilentlyContinue) {
     if (Test-Path Alias:ls) { Remove-Item Alias:ls }
     function ls { eza --icons $args }
@@ -39,7 +38,7 @@ if (Get-Command yazi -ErrorAction SilentlyContinue) {
     }
 }
 
-# 2. Prompt Minimalista sem Cores
+# 3. Prompt Minimalista sem Cores
 function prompt {
     $path = $ExecutionContext.SessionState.Path.CurrentLocation
     $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
@@ -62,8 +61,11 @@ function prompt {
     return "[$path]$gitInfo $symbol "
 }
 
-# 3. Aliases
+# 4. Aliases
 function ga { git add . }
 function gc { param($m) git commit -m "$m" }
 function gs { git status }
 function touch($file) { "" | Out-File $file -Encoding ASCII }
+
+# 5. Inicialização (Deve ser por último para os hooks funcionarem)
+if (Get-Command zoxide -ErrorAction SilentlyContinue) { Invoke-Expression (&zoxide init powershell | Out-String) }
