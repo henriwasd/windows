@@ -1,7 +1,4 @@
-# Perfil Otimizado - Foco em Performance e Histórico
-
-# 1. Configuração do PSReadLine
-if (Get-Module -ListAvailable PSReadLine) {
+if ($Host.Name -eq 'ConsoleHost' -and (Get-Module -ListAvailable PSReadLine)) {
     $PSReadLineOptions = @{
         EditMode                      = 'Windows'
         HistoryNoDuplicates           = $true
@@ -10,14 +7,13 @@ if (Get-Module -ListAvailable PSReadLine) {
         PredictionViewStyle           = 'ListView'
         BellStyle                     = 'None'
     }
-    Set-PSReadLineOption @PSReadLineOptions
+    try { Set-PSReadLineOption @PSReadLineOptions } catch { }
     
     Set-PSReadLineKeyHandler -Key UpArrow -Function HistorySearchBackward
     Set-PSReadLineKeyHandler -Key DownArrow -Function HistorySearchForward
     Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 }
 
-# 2. Funções de Ferramentas
 if (Get-Command eza -ErrorAction SilentlyContinue) {
     if (Test-Path Alias:ls) { Remove-Item Alias:ls }
     function ls { eza --icons $args }
@@ -38,13 +34,21 @@ if (Get-Command yazi -ErrorAction SilentlyContinue) {
     }
 }
 
-# 3. Prompt Minimalista sem Cores
 function prompt {
-    $path = $ExecutionContext.SessionState.Path.CurrentLocation
+    $currentPath = $ExecutionContext.SessionState.Path.CurrentLocation.ProviderPath
+    $homePath = $HOME
+
+    if ($currentPath -like "$homePath*") {
+        $path = $currentPath -replace [regex]::Escape($homePath), "~"
+    }
+    else {
+        $path = Split-Path $currentPath -Leaf
+        if ($path -eq "") { $path = $currentPath }
+    }
+
     $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
     $symbol = if ($isAdmin) { "#" } else { "$" }
     
-    # Git Info sem cores
     $gitInfo = ""
     if (Get-Command git -ErrorAction SilentlyContinue) {
         $branch = git branch --show-current 2>$null
@@ -53,7 +57,7 @@ function prompt {
             $indicators = ""
             if ($status -match '^[MADRCU]') { $indicators += "+" }
             if ($status -match '^.[MADRCU]') { $indicators += "!" }
-            if ($status -match '^\?\?')       { $indicators += "?" }
+            if ($status -match '^\?\?') { $indicators += "?" }
             $gitInfo = " ($branch$indicators)"
         }
     }
@@ -61,11 +65,9 @@ function prompt {
     return "[$path]$gitInfo $symbol "
 }
 
-# 4. Aliases
 function ga { git add . }
 function gc { param($m) git commit -m "$m" }
 function gs { git status }
 function touch($file) { "" | Out-File $file -Encoding ASCII }
 
-# 5. Inicialização (Deve ser por último para os hooks funcionarem)
 if (Get-Command zoxide -ErrorAction SilentlyContinue) { Invoke-Expression (&zoxide init powershell | Out-String) }
