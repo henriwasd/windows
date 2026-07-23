@@ -23,10 +23,10 @@ if ($Host.Name -eq 'ConsoleHost' -and (Get-Module -ListAvailable PSReadLine)) {
     Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 }
 
-# 3. Aliases Rápidos de Git
-if (Test-Path Alias:gc) { Remove-Item Alias:gc -Force }
-if (Test-Path Alias:ga) { Remove-Item Alias:ga -Force }
-if (Test-Path Alias:gs) { Remove-Item Alias:gs -Force }
+# 3. Aliases Rápidos de Git (sem conflitos com os aliases nativos do PowerShell)
+foreach ($aliasName in @('gc', 'ga', 'gs', 'gp', 'gpl', 'gps', 'gpu')) {
+    if (Test-Path "Alias:$aliasName") { Remove-Item "Alias:$aliasName" -Force }
+}
 
 function ga { if ($args) { git add $args } else { git add . } }
 function gc {
@@ -37,6 +37,11 @@ function gc {
     }
 }
 function gs { git status $args }
+function gp { git pull $args }
+function gpl { git pull $args }
+function gpu { git push $args }
+function gps { git push $args }
+
 function touch($file) { "" | Out-File $file -Encoding ASCII }
 
 # 4. Prompt Instantâneo (Sem processos externos)
