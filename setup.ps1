@@ -1,52 +1,44 @@
-# Minimalist PowerShell Setup Script
+# ==============================================================================
+# SCRIPT DE SETUP MINIMALISTA (WINDOWS / POWERSHELL & VSC)
+# ==============================================================================
 
-Write-Host "Iniciando configuracao completa..."
+Write-Host "Iniciando configuracao minimalista..." -ForegroundColor Cyan
 
-# 1. Garantir que o PSReadLine esteja presente e atualizado (para o historico)
+# 1. Garantir que o PSReadLine esteja instalado (para historico e auto-complete)
 if (-not (Get-Module -ListAvailable PSReadLine)) {
-    Write-Host "Instalando PSReadLine para suporte a historico..."
+    Write-Host "Instalando PSReadLine..." -ForegroundColor Yellow
     Install-Module -Name PSReadLine -Force -AllowClobber -Scope CurrentUser
 }
 
-# 2. Instalar ferramentas adicionais via winget
-$tools = @(
-    @{ Name = "zoxide"; Id = "ajeetdsouza.zoxide" },
-    @{ Name = "eza"; Id = "eza-community.eza" },
-    @{ Name = "lazygit"; Id = "JesseDuffield.lazygit" },
-    @{ Name = "yazi"; Id = "sxyazi.yazi" }
-)
-
-foreach ($tool in $tools) {
-    if (-not (Get-Command $tool.Name -ErrorAction SilentlyContinue)) {
-        Write-Host "Instalando $($tool.Name)..."
-        winget install --id $tool.Id --silent --accept-package-agreements --accept-source-agreements
-    } else {
-        Write-Host "$($tool.Name) ja esta instalado."
-    }
+# 2. Instalar apenas o Zoxide via Winget
+if (-not (Get-Command zoxide -ErrorAction SilentlyContinue)) {
+    Write-Host "Instalando Zoxide..." -ForegroundColor Yellow
+    winget install --id ajeetdsouza.zoxide --silent --accept-package-agreements --accept-source-agreements
+} else {
+    Write-Host "Zoxide ja esta instalado." -ForegroundColor Green
 }
 
-# 3. Localizar os diretorios do perfil do PowerShell (Windows PowerShell e Core)
+# 3. Copiar o perfil otimizado do PowerShell (PowerShell 7 e Windows PowerShell 5.1)
 $profileDirs = @(
     (Join-Path $HOME "Documents\WindowsPowerShell"),
     (Join-Path $HOME "Documents\PowerShell")
 )
+
+$localProfile = Join-Path $PSScriptRoot "Microsoft.PowerShell_profile.ps1"
 
 foreach ($dir in $profileDirs) {
     if (-not (Test-Path $dir)) { 
         New-Item -ItemType Directory -Path $dir -Force | Out-Null
     }
 
-    # 4. Copiar o perfil atual para o local correto do sistema
-    Write-Host "Vinculando perfil otimizado em: $dir"
-    $localProfile = Join-Path $PSScriptRoot "Microsoft.PowerShell_profile.ps1"
     $targetProfile = Join-Path $dir "Microsoft.PowerShell_profile.ps1"
 
     if (Test-Path $localProfile) {
         Copy-Item -Path $localProfile -Destination $targetProfile -Force
-        Write-Host "Perfil instalado com sucesso em: $targetProfile"
+        Write-Host "Perfil copiado com sucesso para: $targetProfile" -ForegroundColor Green
     } else {
-        Write-Error "Arquivo Microsoft.PowerShell_profile.ps1 nao encontrado no diretorio atual."
+        Write-Warning "Arquivo Microsoft.PowerShell_profile.ps1 nao encontrado no diretorio atual."
     }
 }
 
-Write-Host "Pronto! Reinicie o seu terminal para aplicar as mudancas."
+Write-Host "Setup concluido com sucesso!" -ForegroundColor Cyan
