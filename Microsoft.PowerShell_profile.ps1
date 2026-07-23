@@ -1,3 +1,12 @@
+# ==============================================================================
+# PERFIL MINIMALISTA E ULTRA-RÁPIDO (POWERSHELL 7)
+# ==============================================================================
+
+# 1. Checagem Única de Administrador (Executada 1x na inicialização)
+$global:IsAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
+$global:PromptSymbol = if ($global:IsAdmin) { "#" } else { "$" }
+
+# 2. PSReadLine (Histórico e Auto-completar inteligente)
 if ($Host.Name -eq 'ConsoleHost' -and (Get-Module -ListAvailable PSReadLine)) {
     $PSReadLineOptions = @{
         EditMode                      = 'Windows'
@@ -14,60 +23,48 @@ if ($Host.Name -eq 'ConsoleHost' -and (Get-Module -ListAvailable PSReadLine)) {
     Set-PSReadLineKeyHandler -Key Tab -Function MenuComplete
 }
 
-if (Get-Command eza -ErrorAction SilentlyContinue) {
-    if (Test-Path Alias:ls) { Remove-Item Alias:ls }
-    function ls { eza --icons $args }
-    function ll { eza -l --icons --git $args }
-}
+# 3. Aliases Rápidos de Git
+if (Test-Path Alias:gc) { Remove-Item Alias:gc -Force }
+if (Test-Path Alias:ga) { Remove-Item Alias:ga -Force }
+if (Test-Path Alias:gs) { Remove-Item Alias:gs -Force }
 
-if (Get-Command lazygit -ErrorAction SilentlyContinue) { function lg { lazygit $args } }
-
-if (Get-Command yazi -ErrorAction SilentlyContinue) {
-    function y {
-        $tmp = New-TemporaryFile
-        yazi $args --cwd-file=$tmp
-        if (Test-Path $tmp) {
-            $cwd = Get-Content $tmp
-            if ($cwd) { cd $cwd }
-            Remove-Item -Force $tmp
-        }
+function ga { if ($args) { git add $args } else { git add . } }
+function gc {
+    if ($args.Count -eq 1 -and $args[0] -notlike "-*") {
+        git commit -m $args[0]
+    } else {
+        git commit $args
     }
 }
+function gs { git status $args }
+function touch($file) { "" | Out-File $file -Encoding ASCII }
 
+# 4. Prompt Instantâneo (Sem processos externos)
 function prompt {
     $currentPath = $ExecutionContext.SessionState.Path.CurrentLocation.ProviderPath
     $homePath = $HOME
 
     if ($currentPath -like "$homePath*") {
         $path = $currentPath -replace [regex]::Escape($homePath), "~"
-    }
-    else {
+    } else {
         $path = Split-Path $currentPath -Leaf
         if ($path -eq "") { $path = $currentPath }
     }
 
-    $isAdmin = ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
-    $symbol = if ($isAdmin) { "#" } else { "$" }
-    
-    $gitInfo = ""
-    if (Get-Command git -ErrorAction SilentlyContinue) {
-        $branch = git branch --show-current 2>$null
-        if ($branch) {
-            $status = git status --porcelain 2>$null
-            $indicators = ""
-            if ($status -match '^[MADRCU]') { $indicators += "+" }
-            if ($status -match '^.[MADRCU]') { $indicators += "!" }
-            if ($status -match '^\?\?') { $indicators += "?" }
-            $gitInfo = " ($branch$indicators)"
-        }
+    $gitBranch = ""
+    if (Test-Path ".git/HEAD") {
+        try {
+            $headContent = Get-Content ".git/HEAD" -TotalCount 1 -ErrorAction SilentlyContinue
+            if ($headContent -match 'ref: refs/heads/(.+)') {
+                $gitBranch = " (" + $matches[1] + ")"
+            }
+        } catch {}
     }
-    
-    return "[$path]$gitInfo $symbol "
+
+    return "[$path]$gitBranch $global:PromptSymbol "
 }
 
-function ga { git add . }
-function gc { param($m) git commit -m "$m" }
-function gs { git status }
-function touch($file) { "" | Out-File $file -Encoding ASCII }
-
-if (Get-Command zoxide -ErrorAction SilentlyContinue) { Invoke-Expression (&zoxide init powershell | Out-String) }
+# 5. Zoxide (Navegação rápida de pastas)
+if (Get-Command zoxide -ErrorAction SilentlyContinue) {
+    Invoke-Expression (&zoxide init powershell | Out-String)
+}
